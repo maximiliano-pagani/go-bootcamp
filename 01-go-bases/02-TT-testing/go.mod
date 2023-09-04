@@ -1,4 +1,4 @@
-module unit-tests
+module 02-testing
 
 go 1.21.0
 

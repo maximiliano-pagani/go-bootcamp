@@ -12,7 +12,6 @@ const (
 )
 
 func Ex4() {
-	fmt.Println("Init ex4")
 	minFunc, minErr := operation(minimum)
 	averageFunc, avgErr := operation(average)
 	maxFunc, maxErr := operation(maximum)

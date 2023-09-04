@@ -9,7 +9,6 @@ const (
 )
 
 func Ex3() {
-	fmt.Println("Init ex3")
 	fmt.Println(getCategorySalary(60, catA))
 	fmt.Println(getCategorySalary(60, catB))
 	fmt.Println(getCategorySalary(60, catC))
