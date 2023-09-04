@@ -1,0 +1,1 @@
+Rename this file to trigger panic on exercise 1.
