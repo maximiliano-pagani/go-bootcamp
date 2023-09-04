@@ -3,6 +3,8 @@ package main
 import "fmt"
 
 func main() {
+	fmt.Println("Init 01-introduction module")
+
 	// Hello world
 	fmt.Println("Hello world")
 	var username = "admin"

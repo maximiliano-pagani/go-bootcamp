@@ -3,7 +3,6 @@ package ex2
 import "fmt"
 
 func Ex2() {
-	fmt.Println("Init ex2")
 	fmt.Println(getAverage(5.5, 2.0, 2.0))
 	fmt.Println(getAverage(5.5))
 	fmt.Println(getAverage(7.5, -2.0))

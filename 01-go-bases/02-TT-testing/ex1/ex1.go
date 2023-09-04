@@ -5,7 +5,6 @@ import (
 )
 
 func Ex1() {
-	fmt.Println("Init ex1")
 	fmt.Println(getSalaryTaxes(40000))
 	fmt.Println(getSalaryTaxes(60000))
 	fmt.Println(getSalaryTaxes(160000))
