@@ -18,17 +18,17 @@ func Ex2() {
 		panic("El archivo indicado no fue encontrado o está dañado")
 	}
 
-	bytes := make([]byte, 32)
-	bytesRead, err := file.Read(bytes)
-
 	defer func() {
 		file.Close()
 		fmt.Println("Ejecución finalizada")
 	}()
 
+	buffer := make([]byte, 32)
+	bytesRead, err := file.Read(buffer)
+
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(string(bytes[:bytesRead]))
+	fmt.Println(string(buffer[:bytesRead]))
 }
