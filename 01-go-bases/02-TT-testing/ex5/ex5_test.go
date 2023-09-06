@@ -18,6 +18,7 @@ func TestDog(t *testing.T) {
 		// Act
 
 		// Assert
+		assert.Equal(t, 0, 0)
 	})
 }
 
@@ -28,6 +29,7 @@ func TestCat(t *testing.T) {
 		// Act
 
 		// Assert
+		assert.Equal(t, 0, 0)
 	})
 }
 
@@ -38,6 +40,7 @@ func TestHamster(t *testing.T) {
 		// Act
 
 		// Assert
+		assert.Equal(t, 0, 0)
 	})
 }
 
@@ -48,5 +51,6 @@ func TestSpider(t *testing.T) {
 		// Act
 
 		// Assert
+		assert.Equal(t, 0, 0)
 	})
 }
