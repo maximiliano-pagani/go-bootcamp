@@ -3,7 +3,6 @@ package repository
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 )
 
@@ -28,13 +27,13 @@ func InitDB() {
 		panic(err)
 	}
 
+	defer file.Close()
+
 	json.NewDecoder(file).Decode(&ProductsDB)
 
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(ProductsDB[0])
 }
 
 func GetAll() []Product {

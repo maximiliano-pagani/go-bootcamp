@@ -20,11 +20,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type User struct {
-	Name     string `json:"nombre"`
-	Lastname string `json:"apellido"`
-}
-
 func main() {
 	service.Init()
 
