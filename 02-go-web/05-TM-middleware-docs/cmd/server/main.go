@@ -22,7 +22,7 @@ package main
 
 import (
 	"05-TM-middleware-docs/cmd/server/handler"
-	auth "05-TM-middleware-docs/cmd/server/middleware"
+	"05-TM-middleware-docs/cmd/server/middleware"
 	"05-TM-middleware-docs/cmd/server/router"
 	"05-TM-middleware-docs/internal/product"
 	"net/http"
@@ -39,14 +39,16 @@ func main() {
 		panic(err)
 	}
 
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery())
+	r.Use(middleware.LoggerMiddleware())
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
 
 	token := os.Getenv("TOKEN")
-	r.Use(auth.TokenAuthMiddleware(token))
+	r.Use(middleware.TokenAuthMiddleware(token))
 
 	jsonDbPath := os.Getenv("JSON_DB_PATH")
 	repository := product.NewProductRepositoryJson(jsonDbPath)

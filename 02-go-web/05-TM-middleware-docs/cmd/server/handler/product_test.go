@@ -1,7 +1,7 @@
 package handler
 
 import (
-	auth "05-TM-middleware-docs/cmd/server/middleware"
+	"05-TM-middleware-docs/cmd/server/middleware"
 	"05-TM-middleware-docs/cmd/server/router"
 	"05-TM-middleware-docs/internal/domain"
 	"05-TM-middleware-docs/internal/product"
@@ -67,10 +67,12 @@ var productsTestSample = []domain.Product{
 }
 
 func createTestServer(dbMock mock.ProductDBMock) *gin.Engine {
-	testRouter := gin.Default()
+	testRouter := gin.New()
+	testRouter.Use(gin.Recovery())
+	testRouter.Use(middleware.LoggerMiddleware())
 
 	token := "123456"
-	testRouter.Use(auth.TokenAuthMiddleware(token))
+	testRouter.Use(middleware.TokenAuthMiddleware(token))
 
 	repository := mock.NewProductRepositoryMock(dbMock)
 	service := product.NewProductServiceDefault(repository)

@@ -1,4 +1,4 @@
-package auth
+package middleware
 
 import (
 	response "05-TM-middleware-docs/pkg/web"
