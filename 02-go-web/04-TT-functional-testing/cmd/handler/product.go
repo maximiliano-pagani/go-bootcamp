@@ -255,7 +255,7 @@ func (h *ProductHandlerDefault) UpdateProduct() gin.HandlerFunc {
 		originalProduct, err := h.service.GetProductById(id)
 
 		if err != nil {
-			response.Failure(c, http.StatusBadRequest, nil)
+			response.Failure(c, http.StatusNotFound, nil)
 			return
 		}
 
@@ -331,7 +331,7 @@ func (h *ProductHandlerDefault) DeleteProduct() gin.HandlerFunc {
 		err = h.service.DeleteProduct(id)
 
 		if err != nil {
-			response.Failure(c, http.StatusBadRequest, nil)
+			response.Failure(c, http.StatusNotFound, nil)
 			return
 		}
 

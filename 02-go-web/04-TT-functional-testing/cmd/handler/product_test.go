@@ -7,7 +7,7 @@ import (
 	response "04-TT-functional-testing/pkg/web"
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -104,9 +104,12 @@ func Test_GetAllProducts_OK(t *testing.T) {
 	)
 	assert.Nil(t, err)
 
+	dataSample := make([]domain.Product, len(productsTestSample))
+	copy(dataSample, productsTestSample)
+
 	r := createTestServer(
 		mock.ProductDBMock{
-			Products: productsTestSample,
+			Products: dataSample,
 			LastId:   5,
 			Error:    nil,
 		},
@@ -139,9 +142,12 @@ func Test_GetProductById_OK(t *testing.T) {
 	)
 	assert.Nil(t, err)
 
+	dataSample := make([]domain.Product, len(productsTestSample))
+	copy(dataSample, productsTestSample)
+
 	r := createTestServer(
 		mock.ProductDBMock{
-			Products: productsTestSample,
+			Products: dataSample,
 			LastId:   5,
 			Error:    nil,
 		},
@@ -154,6 +160,101 @@ func Test_GetProductById_OK(t *testing.T) {
 	// Assert
 	assert.Equal(t, http.StatusOK, respRec.Code)
 	assert.Equal(t, expectedResponse, respRec.Body.Bytes())
+}
+
+func Test_GetProductById_Error(t *testing.T) {
+	t.Run("GetProductById_400_BadRequest", func(t *testing.T) {
+		// Arrange
+		expectedResponse, err := json.Marshal(
+			response.ErrorResponse{
+				Status: http.StatusBadRequest,
+				Code:   http.StatusText(http.StatusBadRequest),
+			},
+		)
+		assert.Nil(t, err)
+
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		r := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    nil,
+			},
+		)
+		req, respRec := createTestRequest(http.MethodGet, "/products/a2d9m6", "")
+
+		// Act
+		r.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusBadRequest, respRec.Code)
+		assert.Equal(t, expectedResponse, respRec.Body.Bytes())
+	})
+
+	t.Run("GetProductById_404_NotFound", func(t *testing.T) {
+		// Arrange
+		expectedResponse, err := json.Marshal(
+			response.ErrorResponse{
+				Status: http.StatusNotFound,
+				Code:   http.StatusText(http.StatusNotFound),
+			},
+		)
+		assert.Nil(t, err)
+
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		r := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    errors.New(""),
+			},
+		)
+		req, respRec := createTestRequest(http.MethodGet, "/products/2841", "")
+
+		// Act
+		r.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusNotFound, respRec.Code)
+		assert.Equal(t, expectedResponse, respRec.Body.Bytes())
+	})
+
+	t.Run("GetProductById_401_Unauthorized", func(t *testing.T) {
+		// Arrange
+		expectedResponse, err := json.Marshal(
+			response.ErrorResponse{
+				Status:  http.StatusUnauthorized,
+				Code:    http.StatusText(http.StatusUnauthorized),
+				Message: "token inválido",
+			},
+		)
+		assert.Nil(t, err)
+
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		r := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    nil,
+			},
+		)
+
+		req, respRec := createTestRequest(http.MethodGet, "/products/4", "")
+		req.Header.Del("Token")
+
+		// Act
+		r.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusUnauthorized, respRec.Code)
+		assert.Equal(t, expectedResponse, respRec.Body.Bytes())
+	})
 }
 
 func Test_NewProduct_OK(t *testing.T) {
@@ -173,9 +274,12 @@ func Test_NewProduct_OK(t *testing.T) {
 	)
 	assert.Nil(t, err)
 
+	dataSample := make([]domain.Product, len(productsTestSample))
+	copy(dataSample, productsTestSample)
+
 	router := createTestServer(
 		mock.ProductDBMock{
-			Products: productsTestSample,
+			Products: dataSample,
 			LastId:   5,
 			Error:    nil,
 		},
@@ -204,9 +308,12 @@ func Test_NewProduct_OK(t *testing.T) {
 
 func Test_DeleteProduct_OK(t *testing.T) {
 	// Arrange
+	dataSample := make([]domain.Product, len(productsTestSample))
+	copy(dataSample, productsTestSample)
+
 	router := createTestServer(
 		mock.ProductDBMock{
-			Products: productsTestSample,
+			Products: dataSample,
 			LastId:   5,
 			Error:    nil,
 		},
@@ -216,7 +323,318 @@ func Test_DeleteProduct_OK(t *testing.T) {
 	// Act
 	router.ServeHTTP(respRec, req)
 
-	fmt.Println(respRec.Body)
 	// Assert
 	assert.Equal(t, http.StatusNoContent, respRec.Code)
+}
+
+func Test_DeleteProduct_Error(t *testing.T) {
+	t.Run("DeleteProduct_400_BadRequest", func(t *testing.T) {
+		// Arrange
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		router := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    nil,
+			},
+		)
+		req, respRec := createTestRequest(http.MethodDelete, "/products/a2d9m6", "")
+
+		// Act
+		router.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusBadRequest, respRec.Code)
+	})
+
+	t.Run("DeleteProduct_401_Unauthorized", func(t *testing.T) {
+		// Arrange
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		router := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    nil,
+			},
+		)
+
+		req, respRec := createTestRequest(http.MethodDelete, "/products/4", "")
+		req.Header.Del("Token")
+
+		// Act
+		router.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusUnauthorized, respRec.Code)
+	})
+
+	t.Run("DeleteProduct_404_NotFound", func(t *testing.T) {
+		// Arrange
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		router := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    errors.New(""),
+			},
+		)
+		req, respRec := createTestRequest(http.MethodDelete, "/products/2841", "")
+
+		// Act
+		router.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusNotFound, respRec.Code)
+	})
+}
+
+func Test_ReplaceProduct_Error(t *testing.T) {
+	t.Run("ReplaceProduct_400_BadRequest", func(t *testing.T) {
+		// Arrange
+		expectedResponse, err := json.Marshal(
+			response.ErrorResponse{
+				Status: http.StatusBadRequest,
+				Code:   http.StatusText(http.StatusBadRequest),
+			},
+		)
+		assert.Nil(t, err)
+
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		router := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    nil,
+			},
+		)
+
+		req, respRec := createTestRequest(
+			http.MethodPut,
+			"/products/3",
+			`{
+				"name": "Update Test Product",
+				"quantity": "BADQUANTITY",
+				"code_value": "we98fefn9f",
+				"is_published": false,
+				"expiration": "11/09/2023",
+				"price": 1050.50
+			}`,
+		)
+
+		// Act
+		router.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusBadRequest, respRec.Code)
+		assert.Equal(t, expectedResponse, respRec.Body.Bytes())
+	})
+
+	t.Run("ReplaceProduct_404_NotFound", func(t *testing.T) {
+		// Arrange
+		expectedResponse, err := json.Marshal(
+			response.ErrorResponse{
+				Status: http.StatusNotFound,
+				Code:   http.StatusText(http.StatusNotFound),
+			},
+		)
+		assert.Nil(t, err)
+
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		router := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    errors.New(""),
+			},
+		)
+
+		req, respRec := createTestRequest(
+			http.MethodPut,
+			"/products/4934",
+			`{
+				"name": "Update Test Product",
+				"quantity": 123,
+				"code_value": "we98fefn9f",
+				"is_published": false,
+				"expiration": "11/09/2023",
+				"price": 1050.50
+			}`,
+		)
+
+		// Act
+		router.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusNotFound, respRec.Code)
+		assert.Equal(t, expectedResponse, respRec.Body.Bytes())
+	})
+
+	t.Run("ReplaceProduct_401_Unauthorized", func(t *testing.T) {
+		// Arrange
+		expectedResponse, err := json.Marshal(
+			response.ErrorResponse{
+				Status:  http.StatusUnauthorized,
+				Code:    http.StatusText(http.StatusUnauthorized),
+				Message: "token inválido",
+			},
+		)
+		assert.Nil(t, err)
+
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		router := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    nil,
+			},
+		)
+
+		req, respRec := createTestRequest(
+			http.MethodPut,
+			"/products/3",
+			`{
+				"name": "Update Test Product",
+				"quantity": 123,
+				"code_value": "we98fefn9f",
+				"is_published": false,
+				"expiration": "11/09/2023",
+				"price": 1050.50
+			}`,
+		)
+		req.Header.Del("Token")
+
+		// Act
+		router.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusUnauthorized, respRec.Code)
+		assert.Equal(t, expectedResponse, respRec.Body.Bytes())
+	})
+}
+
+func Test_UpdateProduct_Error(t *testing.T) {
+	t.Run("UpdateProduct_400_BadRequest", func(t *testing.T) {
+		// Arrange
+		expectedResponse, err := json.Marshal(
+			response.ErrorResponse{
+				Status: http.StatusBadRequest,
+				Code:   http.StatusText(http.StatusBadRequest),
+			},
+		)
+		assert.Nil(t, err)
+
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		router := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    nil,
+			},
+		)
+
+		req, respRec := createTestRequest(
+			http.MethodPatch,
+			"/products/3",
+			`{
+				"price": "$$$1349.0"
+			}`,
+		)
+
+		// Act
+		router.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusBadRequest, respRec.Code)
+		assert.Equal(t, expectedResponse, respRec.Body.Bytes())
+	})
+
+	t.Run("UpdateProduct_404_NotFound", func(t *testing.T) {
+		// Arrange
+		expectedResponse, err := json.Marshal(
+			response.ErrorResponse{
+				Status: http.StatusNotFound,
+				Code:   http.StatusText(http.StatusNotFound),
+			},
+		)
+		assert.Nil(t, err)
+
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		router := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    errors.New(""),
+			},
+		)
+
+		req, respRec := createTestRequest(
+			http.MethodPatch,
+			"/products/4934",
+			`{
+				"price": 1349.0
+			}`,
+		)
+
+		// Act
+		router.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusNotFound, respRec.Code)
+		assert.Equal(t, expectedResponse, respRec.Body.Bytes())
+	})
+
+	t.Run("UpdateProduct_401_Unauthorized", func(t *testing.T) {
+		// Arrange
+		expectedResponse, err := json.Marshal(
+			response.ErrorResponse{
+				Status:  http.StatusUnauthorized,
+				Code:    http.StatusText(http.StatusUnauthorized),
+				Message: "token inválido",
+			},
+		)
+		assert.Nil(t, err)
+
+		dataSample := make([]domain.Product, len(productsTestSample))
+		copy(dataSample, productsTestSample)
+
+		router := createTestServer(
+			mock.ProductDBMock{
+				Products: dataSample,
+				LastId:   5,
+				Error:    nil,
+			},
+		)
+
+		req, respRec := createTestRequest(
+			http.MethodPatch,
+			"/products/3",
+			`{
+				"price": 1349.0
+			}`,
+		)
+		req.Header.Del("Token")
+
+		// Act
+		router.ServeHTTP(respRec, req)
+
+		// Assert
+		assert.Equal(t, http.StatusUnauthorized, respRec.Code)
+		assert.Equal(t, expectedResponse, respRec.Body.Bytes())
+	})
 }
