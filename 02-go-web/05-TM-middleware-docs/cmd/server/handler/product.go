@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"04-TT-functional-testing/internal/domain"
-	"04-TT-functional-testing/internal/product"
-	response "04-TT-functional-testing/pkg/web"
+	"05-TM-middleware-docs/internal/domain"
+	"05-TM-middleware-docs/internal/product"
+	response "05-TM-middleware-docs/pkg/web"
 	"errors"
 	"net/http"
 	"strconv"
@@ -14,11 +14,10 @@ import (
 
 type ProductHandlerDefault struct {
 	service product.ProductService
-	token   string
 }
 
-func NewProductHandlerDefault(service product.ProductService, token string) *ProductHandlerDefault {
-	handler := &ProductHandlerDefault{service: service, token: token}
+func NewProductHandlerDefault(service product.ProductService) *ProductHandlerDefault {
+	handler := &ProductHandlerDefault{service: service}
 	return handler
 }
 
@@ -43,11 +42,6 @@ type ResponseProduct struct {
 
 func (h *ProductHandlerDefault) GetAllProducts() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.GetHeader("TOKEN") != h.token {
-			response.Failure(c, http.StatusUnauthorized, errors.New("token inválido"))
-			return
-		}
-
 		results, err := h.service.GetAllProducts()
 
 		if err != nil {
@@ -62,11 +56,6 @@ func (h *ProductHandlerDefault) GetAllProducts() gin.HandlerFunc {
 
 func (h *ProductHandlerDefault) GetProductById() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.GetHeader("TOKEN") != h.token {
-			response.Failure(c, http.StatusUnauthorized, errors.New("token inválido"))
-			return
-		}
-
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
@@ -88,11 +77,6 @@ func (h *ProductHandlerDefault) GetProductById() gin.HandlerFunc {
 
 func (h *ProductHandlerDefault) GetProductsByMinPrice() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.GetHeader("TOKEN") != h.token {
-			response.Failure(c, http.StatusUnauthorized, errors.New("token inválido"))
-			return
-		}
-
 		param := c.Query("priceGt")
 
 		if param == "" {
@@ -126,11 +110,6 @@ func (h *ProductHandlerDefault) GetProductsByMinPrice() gin.HandlerFunc {
 
 func (h *ProductHandlerDefault) NewProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.GetHeader("TOKEN") != h.token {
-			response.Failure(c, http.StatusUnauthorized, errors.New("token inválido"))
-			return
-		}
-
 		reqBody := &RequestProduct{}
 		err := c.ShouldBindJSON(reqBody)
 
@@ -179,11 +158,6 @@ func (h *ProductHandlerDefault) NewProduct() gin.HandlerFunc {
 
 func (h *ProductHandlerDefault) ReplaceProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.GetHeader("TOKEN") != h.token {
-			response.Failure(c, http.StatusUnauthorized, errors.New("token inválido"))
-			return
-		}
-
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
@@ -240,11 +214,6 @@ func (h *ProductHandlerDefault) ReplaceProduct() gin.HandlerFunc {
 
 func (h *ProductHandlerDefault) UpdateProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.GetHeader("TOKEN") != h.token {
-			response.Failure(c, http.StatusUnauthorized, errors.New("token inválido"))
-			return
-		}
-
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
@@ -316,11 +285,6 @@ func (h *ProductHandlerDefault) UpdateProduct() gin.HandlerFunc {
 
 func (h *ProductHandlerDefault) DeleteProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.GetHeader("TOKEN") != h.token {
-			response.Failure(c, http.StatusUnauthorized, errors.New("token inválido"))
-			return
-		}
-
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {

@@ -1,10 +1,12 @@
 package handler
 
 import (
-	"04-TT-functional-testing/internal/domain"
-	"04-TT-functional-testing/internal/product"
-	"04-TT-functional-testing/mock"
-	response "04-TT-functional-testing/pkg/web"
+	auth "05-TM-middleware-docs/cmd/server/middleware"
+	"05-TM-middleware-docs/cmd/server/router"
+	"05-TM-middleware-docs/internal/domain"
+	"05-TM-middleware-docs/internal/product"
+	"05-TM-middleware-docs/mock"
+	response "05-TM-middleware-docs/pkg/web"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -65,23 +67,17 @@ var productsTestSample = []domain.Product{
 }
 
 func createTestServer(dbMock mock.ProductDBMock) *gin.Engine {
+	testRouter := gin.Default()
+
 	token := "123456"
+	testRouter.Use(auth.TokenAuthMiddleware(token))
 
 	repository := mock.NewProductRepositoryMock(dbMock)
 	service := product.NewProductServiceDefault(repository)
-	handler := NewProductHandlerDefault(service, token)
+	handler := NewProductHandlerDefault(service)
 
-	testRouter := gin.Default()
-
-	productsRouter := testRouter.Group("/products")
-
-	productsRouter.GET("/", handler.GetAllProducts())
-	productsRouter.POST("/", handler.NewProduct())
-	productsRouter.GET("/:id", handler.GetProductById())
-	productsRouter.PUT("/:id", handler.ReplaceProduct())
-	productsRouter.PATCH("/:id", handler.UpdateProduct())
-	productsRouter.DELETE("/:id", handler.DeleteProduct())
-	productsRouter.GET("/search", handler.GetProductsByMinPrice())
+	routerProduct := router.NewProductRouter(testRouter, handler)
+	routerProduct.MapRoutes()
 
 	return testRouter
 }

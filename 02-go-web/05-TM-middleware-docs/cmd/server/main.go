@@ -21,8 +21,10 @@ package main
 // Recordá: si una consulta está mal formulada por parte del cliente, el status code cae en los 4XX.
 
 import (
-	"04-TT-functional-testing/cmd/handler"
-	"04-TT-functional-testing/internal/product"
+	"05-TM-middleware-docs/cmd/server/handler"
+	auth "05-TM-middleware-docs/cmd/server/middleware"
+	"05-TM-middleware-docs/cmd/server/router"
+	"05-TM-middleware-docs/internal/product"
 	"net/http"
 	"os"
 
@@ -31,30 +33,32 @@ import (
 )
 
 func main() {
-	godotenv.Load("./.env")
+	err := godotenv.Load("./.env")
 
-	token := os.Getenv("TOKEN")
-	jsonPath := os.Getenv("JSON_PATH")
+	if err != nil {
+		panic(err)
+	}
 
-	repository := product.NewProductRepositoryJson(jsonPath)
-	service := product.NewProductServiceDefault(repository)
-	handler := handler.NewProductHandlerDefault(service, token)
+	r := gin.Default()
 
-	router := gin.Default()
-
-	router.GET("/ping", func(c *gin.Context) {
+	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
 
-	productsRouter := router.Group("/products")
+	token := os.Getenv("TOKEN")
+	r.Use(auth.TokenAuthMiddleware(token))
 
-	productsRouter.GET("/", handler.GetAllProducts())
-	productsRouter.POST("/", handler.NewProduct())
-	productsRouter.GET("/:id", handler.GetProductById())
-	productsRouter.PUT("/:id", handler.ReplaceProduct())
-	productsRouter.PATCH("/:id", handler.UpdateProduct())
-	productsRouter.DELETE("/:id", handler.DeleteProduct())
-	productsRouter.GET("/search", handler.GetProductsByMinPrice())
+	jsonDbPath := os.Getenv("JSON_DB_PATH")
+	repository := product.NewProductRepositoryJson(jsonDbPath)
+	service := product.NewProductServiceDefault(repository)
+	handler := handler.NewProductHandlerDefault(service)
 
-	router.Run(":8080")
+	routerProduct := router.NewProductRouter(r, handler)
+	routerProduct.MapRoutes()
+
+	err = r.Run(":8080")
+
+	if err != nil {
+		panic(err)
+	}
 }

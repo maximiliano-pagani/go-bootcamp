@@ -1,6 +1,6 @@
 package product
 
-import "04-TT-functional-testing/internal/domain"
+import "05-TM-middleware-docs/internal/domain"
 
 type ProductService interface {
 	GetAllProducts() ([]domain.Product, error)

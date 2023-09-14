@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"04-TT-functional-testing/internal/domain"
+	"05-TM-middleware-docs/internal/domain"
 	"errors"
 )
 
