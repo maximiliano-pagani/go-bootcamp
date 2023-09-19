@@ -24,14 +24,27 @@ import (
 	"05-TM-middleware-docs/cmd/server/handler"
 	"05-TM-middleware-docs/cmd/server/middleware"
 	"05-TM-middleware-docs/cmd/server/router"
+	"05-TM-middleware-docs/docs"
 	"05-TM-middleware-docs/internal/product"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title MELI Bootcamp Products API
+// @version 1.0
+// @description This API is built incrementally over many bootcamp exercises
+// @termsOfService https://developers.mercadolibre.com.ar/es_ar/terminos-y-condiciones
+
+// @contact.name API Support
+// @contact.url https://developers.mercadolibre.com.ar/support
+
+// @licence.name Apache 2.0
+// @licence.url https://www.apache.org/licenses/LICENSE-2.0.html
 func main() {
 	err := godotenv.Load("./.env")
 
@@ -42,6 +55,10 @@ func main() {
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(middleware.LoggerMiddleware())
+
+	host := os.Getenv("HOST")
+	docs.SwaggerInfo.Host = host
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
@@ -58,7 +75,7 @@ func main() {
 	routerProduct := router.NewProductRouter(r, handler)
 	routerProduct.MapRoutes()
 
-	err = r.Run(":8080")
+	err = r.Run(host)
 
 	if err != nil {
 		panic(err)

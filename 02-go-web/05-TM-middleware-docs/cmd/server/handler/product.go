@@ -40,6 +40,15 @@ type ResponseProduct struct {
 	Price       float64 `json:"price"`
 }
 
+// GetAllProducts godoc
+// @Summary      List all products
+// @Description  Searches and returns all products currently listed
+// @Tags         products
+// @Produce      json
+// @Param        token header string true "Token"
+// @Success      200 {object}  response.SuccessResponse
+// @Failure      500 {object}  response.ErrorResponse
+// @Router       /products [get]
 func (h *ProductHandlerDefault) GetAllProducts() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		results, err := h.service.GetAllProducts()
@@ -54,6 +63,17 @@ func (h *ProductHandlerDefault) GetAllProducts() gin.HandlerFunc {
 	}
 }
 
+// GetProductById godoc
+// @Summary      List a specific product
+// @Description  Searches and returns a product that matches the id provided
+// @Tags         products
+// @Produce      json
+// @Param        id path int true "Id"
+// @Param        token header string true "Token"
+// @Success      200 {object}  response.SuccessResponse
+// @Failure      400 {object}  response.ErrorResponse
+// @Failure      404 {object}  response.ErrorResponse
+// @Router       /products/{id} [get]
 func (h *ProductHandlerDefault) GetProductById() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
@@ -75,6 +95,17 @@ func (h *ProductHandlerDefault) GetProductById() gin.HandlerFunc {
 	}
 }
 
+// GetProductsByMinPrice godoc
+// @Summary      List all products with min price
+// @Description  Searches and returns all products with price greater than min provided
+// @Tags         products
+// @Produce      json
+// @Param        priceGt query float64 true "Price greater than"
+// @Param        token header string true "Token"
+// @Success      200 {object}  response.SuccessResponse
+// @Failure      400 {object}  response.ErrorResponse
+// @Failure      500 {object}  response.ErrorResponse
+// @Router       /products/search [get]
 func (h *ProductHandlerDefault) GetProductsByMinPrice() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		param := c.Query("priceGt")
@@ -108,6 +139,17 @@ func (h *ProductHandlerDefault) GetProductsByMinPrice() gin.HandlerFunc {
 	}
 }
 
+// NewProduct godoc
+// @Summary      New product
+// @Description  Creates a new product with the values provided in request body
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Param        token header string true "Token"
+// @Param        body body handler.RequestProduct true "Product"
+// @Success      201 {object}  response.SuccessResponse
+// @Failure      400 {object}  response.ErrorResponse
+// @Router       /products [post]
 func (h *ProductHandlerDefault) NewProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		reqBody := &RequestProduct{}
@@ -156,6 +198,19 @@ func (h *ProductHandlerDefault) NewProduct() gin.HandlerFunc {
 	}
 }
 
+// ReplaceProduct godoc
+// @Summary      Replace product
+// @Description  Completely replaces the product id specified with the values in the request body
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "Id"
+// @Param        token header string true "Token"
+// @Param        body body handler.RequestProduct true "Product"
+// @Success      200 {object}  response.SuccessResponse
+// @Failure      400 {object}  response.ErrorResponse
+// @Failure      404 {object}  response.ErrorResponse
+// @Router       /products/{id} [put]
 func (h *ProductHandlerDefault) ReplaceProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
@@ -212,6 +267,19 @@ func (h *ProductHandlerDefault) ReplaceProduct() gin.HandlerFunc {
 	}
 }
 
+// UpdateProduct godoc
+// @Summary      Update product
+// @Description  Partially updates the product id specified with the values in the request body
+// @Tags         products
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "Id"
+// @Param        token header string true "Token"
+// @Param        body body handler.RequestProduct true "Product"
+// @Success      201 {object}  response.SuccessResponse
+// @Failure      400 {object}  response.ErrorResponse
+// @Failure      404 {object}  response.ErrorResponse
+// @Router       /products/{id} [patch]
 func (h *ProductHandlerDefault) UpdateProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
@@ -283,6 +351,16 @@ func (h *ProductHandlerDefault) UpdateProduct() gin.HandlerFunc {
 	}
 }
 
+// DeleteProduct godoc
+// @Summary      Delete product
+// @Description  Deletes a product with the specified id, if exists
+// @Tags         products
+// @Param        id path int true "Id"
+// @Param        token header string true "Token"
+// @Success      204 {object}  response.SuccessResponse
+// @Failure      400 {object}  response.ErrorResponse
+// @Failure      404 {object}  response.ErrorResponse
+// @Router       /products/{id} [delete]
 func (h *ProductHandlerDefault) DeleteProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))

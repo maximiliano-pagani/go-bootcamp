@@ -1,0 +1,265 @@
+definitions:
+  handler.RequestProduct:
+    properties:
+      code_value:
+        type: string
+      expiration:
+        type: string
+      is_published:
+        type: boolean
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+    type: object
+  response.ErrorResponse:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  response.SuccessResponse:
+    properties:
+      data: {}
+    type: object
+info:
+  contact:
+    name: API Support
+    url: https://developers.mercadolibre.com.ar/support
+  description: This API is built incrementally over many bootcamp exercises
+  termsOfService: https://developers.mercadolibre.com.ar/es_ar/terminos-y-condiciones
+  title: MELI Bootcamp Products API
+  version: "1.0"
+paths:
+  /products:
+    get:
+      description: Searches and returns all products currently listed
+      parameters:
+      - description: Token
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: List all products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Creates a new product with the values provided in request body
+      parameters:
+      - description: Token
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: Product
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.RequestProduct'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: New product
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      description: Deletes a product with the specified id, if exists
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Token
+        in: header
+        name: token
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Delete product
+      tags:
+      - products
+    get:
+      description: Searches and returns a product that matches the id provided
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Token
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: List a specific product
+      tags:
+      - products
+    patch:
+      consumes:
+      - application/json
+      description: Partially updates the product id specified with the values in the
+        request body
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Token
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: Product
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.RequestProduct'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Update product
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Completely replaces the product id specified with the values in
+        the request body
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Token
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: Product
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.RequestProduct'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Replace product
+      tags:
+      - products
+  /products/search:
+    get:
+      description: Searches and returns all products with price greater than min provided
+      parameters:
+      - description: Price greater than
+        in: query
+        name: priceGt
+        required: true
+        type: number
+      - description: Token
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: List all products with min price
+      tags:
+      - products
+swagger: "2.0"
