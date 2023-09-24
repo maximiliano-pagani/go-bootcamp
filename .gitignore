@@ -23,3 +23,6 @@ go.work
 # Env
 *.env
 *.env*
+
+# DS_Store macOS
+*.DS_Store
